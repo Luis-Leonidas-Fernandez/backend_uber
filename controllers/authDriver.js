@@ -21,6 +21,8 @@ const {
          licencia   
 } = req.body;
 
+console.log('[📥 Datos recibidos en /register-driver]', req.body);
+
     try {
 
         const existeDriver = await Driver.findOne({ email, nacimiento:nacimiento, patente: patente });
@@ -87,7 +89,7 @@ const data = {
 
 
     } catch (error) {
-       
+        console.error('❌ Error al registrar conductor:', error);
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'

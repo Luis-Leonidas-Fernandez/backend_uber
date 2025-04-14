@@ -7,12 +7,12 @@ const Driver = require('../models/driver');
 const postUbicacion = async(req, res = response) => {
 
    
-    const { miId, estado, ubicacion } = req.body;   
- 
+    const { miId, estado, ubicacion, destino ,distanciaKm, precio } = req.body;   
+  
     try {
 
         const usuarioDb    = await Usuario.findOne({miId});
-       
+     
         if (!usuarioDb) {
             return res.status(404).json({
                 ok: false,
@@ -20,18 +20,21 @@ const postUbicacion = async(req, res = response) => {
             });
         }
        
-
+        
         const imput = {
             miId: miId,
             estado: estado,            
             ubicacion: {type: "Point", coordinates: ubicacion},
+            destino: {type: "Point", coordinates: destino},
+            distanciaKm: distanciaKm,
+            precio: precio,
             mensaje:   { type: "Point",coordinates: [  [-58.984374,-27.451225]  ]}
           
             
         }        
-  
+       
         const dist = await buscarZonaCercanaPost(ubicacion);      
-        
+      
        
         if(dist <= 2000){           
            
@@ -48,20 +51,24 @@ const postUbicacion = async(req, res = response) => {
                 miId: result.miId,
                 estado: result.estado,
                 ubicacion: result.ubicacion,
+                distanciaKm: result.distanciaKm,
+                precio: result.precio,
                 mensaje: { type: types, coordinates: points},
                 createdAt: result.createdAt,
                 updatedAt: result.updatedAt
             }
+
+            console.log('[Build Document:]', data);
             
             return res.status(200).json({data});
 
         } else{
-            
+            console.log('paso por aqui: respuesta miId: null')
             const data = {
-                
+                id: null,
                 miId: null
             }
-            return res.status(201).json({ data});;
+            return res.status(200).json({ data});;
         }
 
         
@@ -75,53 +82,63 @@ const postUbicacion = async(req, res = response) => {
     }
 }
 
-const removeAddress = async(req = request, res = response) => {   
-           
-    const {order, miId,  } = req.body;    
-       
-   try {
-    
-    
-      const UserAddress = await Address.findOneAndUpdate({miId: miId}, {$unset: {miId: "", estado: ""}});                          
-     
-
-       if (!UserAddress){
+const removeAddress = async (req = request, res = response) => {
+    const { order, miId, precioTotal } = req.body;
+  
+    try {
+      // 🧩 Actualizamos el documento del usuario: eliminamos campos, y agregamos otros
+      const UserAddress = await Address.findOneAndUpdate(
+        { miId: miId },
+        {
+          $unset: { miId: "", estado: "" },
+          $set: {
+            precioTotal: precioTotal,
+            finalizado: true,
+          }
+        },
+        { new: true } // ← para obtener el documento actualizado
+      );
+  
+      if (!UserAddress) {
         return res.status(400).json({
-           ok: false,
-           msg: 'El pedido no puede ser cancelado'
-       });
-     } 
-     
-     
-     const idDriver = UserAddress.idDriver;        
-
-        await Address.findOneAndUpdate({idDriver: idDriver}, {$unset:{idDriver: ""}});
-        await Driver.findOneAndUpdate({_id: idDriver},
-             {$set: 
-                { order: order,
-                    status: 'disponible',
-                      upsert: true ,
-                       }} );  
-
-      
-
-       const data = {
-           UserAddress,                
-       } 
-                       
-       res.json({
-           data
-       });
-   
-       } catch (error) {
-          
-           res.status(500).json({
-               ok: false,
-               msg: 'Hable con el administrador'
-           });
-   }
-         
-}
+          ok: false,
+          msg: 'El pedido no puede ser cancelado'
+        });
+      }
+  
+      const idDriver = UserAddress.idDriver;
+  
+      // ❌ Quitamos idDriver del documento de la Address
+      await Address.findOneAndUpdate(
+        { idDriver: idDriver },
+        { $unset: { idDriver: "" } }
+      );
+  
+      // ✅ Liberamos al conductor
+      await Driver.findOneAndUpdate(
+        { _id: idDriver },
+        {
+          $set: {
+            order: order,
+            status: 'disponible'
+          },
+          $upsert: true
+        }
+      );
+  
+      res.json({
+        data: UserAddress
+      });
+  
+    } catch (error) {
+      console.error('❌ Error en removeAddress:', error);
+      res.status(500).json({
+        ok: false,
+        msg: 'Hable con el administrador'
+      });
+    }
+  };
+  
 
 const finishTravelUser = async(req, res = response) => {
 

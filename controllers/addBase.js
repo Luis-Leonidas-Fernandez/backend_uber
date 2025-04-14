@@ -78,12 +78,15 @@ const addBaseDriver = async(req = request, res = response) => {
       });
 
     } 
+
+    
       
     
      }
        
 
           
+
 
 
 
@@ -193,8 +196,26 @@ const getDriversfromBase = async(req = request, res = response) => {
         
 }
 
+const getAllBases = async(req = request, res = response) => {          
+
+  const bases = await Base.find();     
+
+  if (!bases){
+     return res.status(400).json({
+          ok: false,
+          msg: 'No se hallaron bases registradas'
+    });
+  }  
+
+  
+    res.status(200).json({ ok: true, bases});
+
+}
+
+
 module.exports ={
     addBaseDriver,
     addBaseAdmin,
-    getDriversfromBase
+    getDriversfromBase,
+    getAllBases
 }

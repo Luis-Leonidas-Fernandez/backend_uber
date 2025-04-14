@@ -33,6 +33,18 @@ const AddressSchema = Schema({
     },  
         
    },
+   destino: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point',
+    },
+    coordinates: {
+      type: [Number],
+      required: false,
+      index: '2dsphere'
+    },
+  },
 
     mensaje: {
 
@@ -47,7 +59,42 @@ const AddressSchema = Schema({
             required: false   
     },    
        
-   }, 
+   },
+
+     precio: {
+      type: Number,
+      required: false,
+    },
+
+     distanciaKm: {
+     type: Number,
+     required: false,
+    },
+    horaEsperaInicio: {
+        type: Date,
+        required: false  
+    },
+    horaEsperaFin: {
+        type: Date,
+        required: false,
+        default: null  
+    },
+
+    precioTotal: {
+        type: Number,
+        required: false,
+      },
+      finalizado: {
+        type: String,
+        required: false,
+      },  
+   
+   blackList: {
+    type: [Schema.Types.ObjectId],
+    ref: 'Driver',
+    default: []
+  },
+  
     
 }, 
 

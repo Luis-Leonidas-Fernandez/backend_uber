@@ -26,13 +26,14 @@ const buscarZonaCercanaPost= async (ubicacion) => {
     if( !zonas || zonas.length === 0) {
 
         const distance = 4000;
+     
         return distance;
-
+    
     } else {        
 
         // elije la base mas cercana y redondea la distancia
       const dist = redondearNumber(zonas);
-     
+      
       return dist;
 
     }

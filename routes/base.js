@@ -5,7 +5,7 @@
 const { Router } = require( 'express');
 const { check } = require( 'express-validator');
 
-const { addBaseAdmin, addBaseDriver, getDriversfromBase } = require( '../controllers/addBase');
+const { addBaseAdmin, addBaseDriver, getDriversfromBase , getAllBases} = require( '../controllers/addBase');
 const { validarCampos } = require( '../middlewares/validar-campos');
 const { validarJWT } = require( '../middlewares/validar-jwt');
 
@@ -30,5 +30,9 @@ router.put('/add-driver-to-base/:_id', [
 
 //get base and drivers
 router.get('/drivers-from-admin/:_id/:base', validarJWT,getDriversfromBase);
+
+// get all bases
+router.get('/all', validarJWT,getAllBases);
+
 
 module.exports = router;

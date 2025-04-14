@@ -66,10 +66,11 @@ const assigDriverAutomatic = async( req = request, res = response ) => {
         
         const idBase    = zona.basesIds;
         const distancia = zona.dist;        
-        
+        console.log('id base', idBase);
+        console.log('distancia', distancia);
 
          if(distancia > 3000) {   
-          
+         
           return res.json({
             ok: false,
             driversNotAvailable,
@@ -79,45 +80,55 @@ const assigDriverAutomatic = async( req = request, res = response ) => {
         }
         
         // **** BUSCA TODAS LAS BASES DE UNA DETERMINADA ZONA MAS SUS CONDUCTORES *****
-        const driverList = await findBasesByIdsAndDrivers(idBase);        
-      
-        //*** SEGUNDA PARTE ASIGNAR CONDUCTOR***              
+        const driverList = await findBasesByIdsAndDrivers(idBase);
+        
+        if (driverList.length === 0) {
+            return res.json({ ok: false, driversNotAvailable, miId });
+        }
+        
+        // 🧠 Traer address actual del usuario para revisar la blacklist
+        const userAddress = await Address.findOne({ miId });
 
-        if( driverList.length !== 0 ){
+        if (!userAddress) {
+         return res.json({ ok: false, msg: 'No se encontró la dirección del usuario' });
+        }
 
-            //Obteniendo Id de un Conductor           
-         
-            const idDriver = driverList[0].drivers._id.toString();           
-            const id  = miId;
-                               
-            // Agregando Un Conductor a una address
-       
-            const userAddress = await addDriverToAddress(id, idDriver);           
-            
-            // no existe conductor para asignar
-            if(userAddress.length == 0) {
-            
-            return res.json({
-                ok: false,
-                driversNotAvailable,
-                miId
-             });  
-            } 
+        const blacklist = userAddress.blackList.map(driver => driver.toString());
+        
+        // 🔁 Buscar conductor que NO esté en blacklist
+        let assignedDriver = null;
 
-            // Actualizando el Modelo DRIVER en su campo Status: NO DISPONIBLES
+        for (const item of driverList) {
+        const idDriver = item.drivers._id.toString();
 
-            await updateStatusDriverAsing(idDriver, noDisponible);
+        if (!blacklist.includes(idDriver)) {
+        assignedDriver = idDriver;
+        break;
+        }
+       }
+        
+        if (!assignedDriver) {
+        return res.json({ ok: false, driversNotAvailable, miId });
+        }
+        
+        console.log('[assignedDriver value:]', assignedDriver);
+        
+         // ✅ Asignar conductor a la Address
+         const addressUpdated = await addDriverToAddress(miId, assignedDriver);
+
+         if (!addressUpdated) {
+         return res.json({ ok: false, driversNotAvailable, miId });
+
+        }
+
+        //Actualiza el estdod del coductor a en-camino
+        await updateStatusDriverAsing(assignedDriver, noDisponible);
               
-            const data = {
-                userAddress                
-            }  
+        
+        const data = { addressUpdated }  
 
-            return res.json({ok: true , data});
-            
-        } else {
-
-            return res.json({ ok: false, driversNotAvailable, miId});
-        } 
+        return res.json({ok: true , data});
+        
                           
         
     } catch (error) {

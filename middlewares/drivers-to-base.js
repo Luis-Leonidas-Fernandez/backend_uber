@@ -12,10 +12,10 @@ const searchDrivers = async (idBase ) =>  {
 }
 
 
-const updateStatusDriverAsing = async (idDriver, noDisponible) => {   
+const updateStatusDriverAsing = async (assignedDriver, noDisponible) => {   
     
     //Actualiza el Estatus del Conductor
-    const resp = await driverRepository.findByIdUpdateStatus(idDriver, noDisponible);
+    const resp = await driverRepository.findByIdUpdateStatus(assignedDriver, noDisponible);
     return resp;  
 }
 

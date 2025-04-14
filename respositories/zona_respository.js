@@ -16,20 +16,23 @@ class ZonaRepository {
 
     const latUser = ubicacion[1];
     const longUser  = ubicacion[0];
-   
+  
     try {
-
+     
       const zona = await Zona.aggregate([
       
         {
         $geoNear: {
-          near: { type: "Point", coordinates: [ longUser, latUser] },
+          near: { type: "Point", coordinates: [longUser,latUser] },
             distanceField: "dist.calculated",
             maxDistance: 3000,                 
             includeLocs: "dist.location",
-            spherical: true
-          }
+            spherical: true,
+            
+          },
+          
         },
+
         {
           $lookup:
           {

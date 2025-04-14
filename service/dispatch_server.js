@@ -4,11 +4,12 @@ const mongoose = require('mongoose');
 
 
 const mainAxios = axios.create({
-    baseURL: "https://www.inriservice.com/api/booking",
+    baseURL: "http://localhost:3000/api/booking",
     timeout: 5000
 })
 
-    
+    //localhost:3000
+    //"https://www.inriservice.com/api/booking"
     
     const  dispatchDrivers = async () => {     
      
@@ -84,7 +85,9 @@ const mainAxios = axios.create({
         
         const id = miId.toString();      
         const res = await mainAxios.patch(`/${id}`, ubicacion);
-        const result = res.data;      
+
+        const result = res.data;
+             
         return result;
     }
 

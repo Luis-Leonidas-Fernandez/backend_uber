@@ -57,7 +57,7 @@ const buscarBaseCercana = async(ubicacion) => {
 //Busca Todas las Bases de una Zona : que coincidan con Ids ingresados con todos sus conductores
 //idBase es un array de ids de bases
  const findBasesByIdsAndDrivers = async (idBase) => {
-   
+    
     try {
          
         let objectIdArray;
@@ -68,9 +68,16 @@ const buscarBaseCercana = async(ubicacion) => {
         } else {
             objectIdArray = [idBase]
         }
-        // Convertir los IDs de la variable a ObjectId
-        const baseIds = objectIdArray.map(id => new mongoose.Types.ObjectId(id));
 
+      
+        // Convertir los IDs de la variable a ObjectId
+        const baseIds = objectIdArray.map(id => 
+            mongoose.Types.ObjectId.isValid(id) && !(id instanceof mongoose.Types.ObjectId)
+              ? new mongoose.Types.ObjectId(id)
+              : id
+          );
+          
+       
         const bases = await Base.aggregate([
             {
                 $match: {_id: { $in:  baseIds} }

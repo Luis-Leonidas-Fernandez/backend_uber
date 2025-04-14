@@ -19,8 +19,8 @@ class DriverRepository {
 
 
   //Actualiza el Estatus del Conductor 
-  async findByIdUpdateStatus(idDriver, noDisponible) {
-    const resp = await Driver.findOneAndUpdate({_id: idDriver}, {$set: {status: noDisponible}}, { upsert: true });
+  async findByIdUpdateStatus(assignedDriver, noDisponible) {
+    const resp = await Driver.findOneAndUpdate({_id: assignedDriver}, {$set: {status: noDisponible}}, { upsert: true });
     return resp;  
   }
 

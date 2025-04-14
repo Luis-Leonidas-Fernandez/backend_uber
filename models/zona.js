@@ -1,4 +1,5 @@
 const { Schema, model } = require( 'mongoose');
+const ubicacion = require('./ubicacion');
 
 const ZonaSchema = Schema({
 
@@ -22,8 +23,8 @@ const ZonaSchema = Schema({
             required: true,
         },             
         coordinates: {
-            type: String,
-            required: false,                    
+            type: Number,
+            required: true,                    
     },    
         
     },
@@ -33,6 +34,8 @@ const ZonaSchema = Schema({
    
 
 });
+
+ZonaSchema.index({ ubicacion: "2dsphere" });
 
 ZonaSchema.method('toJSON', function() {
     const { __v, ...object } = this.toObject();

@@ -20,18 +20,38 @@ const obtenerViajeDriver = async ( req, res = response ) => {
                     foreignField: "_id",//usuario
                     as: "user"
                 }
-            },
-             {
+            },            
+            {
                 $replaceRoot: {newRoot: {$mergeObjects: [{$arrayElemAt: ['$user', 0]}, "$$ROOT"]}}
-            },       
+            },
+            {
+                $lookup: {
+                  from: "drivers",
+                  localField: "idDriver",
+                  foreignField: "_id",
+                  as: "driver"
+                }
+              },
+              {
+                $replaceRoot: {
+                  newRoot: {
+                    $mergeObjects: [ { $arrayElemAt: ["$driver", 0] }, "$$ROOT" ]}}
+              },
+                     
               {$project: { 
                     _id: 1,
                     nombre: 1,
                     email: 1,
                     online: 1,
                     estado: 1,
+                    order: 1,
                     cupon: 1,
                     ubicacion: 1,
+                    destino: 1,
+                    distanciaKm: 1,                    
+                    precio: 1,
+                    horaEsperaInicio: 1,
+                    horaEsperaFin: 1,
                     createdAt: 1,
                     updatedAt: 1,
                     idDriver: 1,                                    
