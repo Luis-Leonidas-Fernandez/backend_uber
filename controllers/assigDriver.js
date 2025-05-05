@@ -1,6 +1,7 @@
 const { response } = require('express');
 const Address      = require('../models/ubicacion');
 const Driver       = require('../models/driver');
+const Base = require('../models/base');
 const { buscarZonaCercana } = require('../middlewares/buscar-zona');
 const { updateStatusDriverAsing  } = require('../middlewares/drivers-to-base');
 const { addDriverToAddress, } = require('../middlewares/address');
@@ -65,9 +66,11 @@ const assigDriverAutomatic = async( req = request, res = response ) => {
         const zona = await buscarZonaCercana(ubicacion);       
         
         const idBase    = zona.basesIds;
-        const distancia = zona.dist;        
-        console.log('id base', idBase);
-        console.log('distancia', distancia);
+        const distancia = zona.dist;
+        const baseSelected   =  await Base.findOne({_id: idBase});
+        const baseLocation = baseSelected.ubicacion.coordinates;  
+
+
 
          if(distancia > 3000) {   
          
@@ -78,14 +81,19 @@ const assigDriverAutomatic = async( req = request, res = response ) => {
           })
 
         }
-        
+      
+
         // **** BUSCA TODAS LAS BASES DE UNA DETERMINADA ZONA MAS SUS CONDUCTORES *****
         const driverList = await findBasesByIdsAndDrivers(idBase);
-        
+       
+
         if (driverList.length === 0) {
+
             return res.json({ ok: false, driversNotAvailable, miId });
+
         }
-        
+
+      
         // 🧠 Traer address actual del usuario para revisar la blacklist
         const userAddress = await Address.findOne({ miId });
 
@@ -111,10 +119,9 @@ const assigDriverAutomatic = async( req = request, res = response ) => {
         return res.json({ ok: false, driversNotAvailable, miId });
         }
         
-        console.log('[assignedDriver value:]', assignedDriver);
         
          // ✅ Asignar conductor a la Address
-         const addressUpdated = await addDriverToAddress(miId, assignedDriver);
+         const addressUpdated = await addDriverToAddress(miId, assignedDriver,baseLocation);
 
          if (!addressUpdated) {
          return res.json({ ok: false, driversNotAvailable, miId });

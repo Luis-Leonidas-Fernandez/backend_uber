@@ -42,11 +42,12 @@ const AddressSchema = Schema({
     coordinates: {
       type: [Number],
       required: false,
+      default: null,
       index: '2dsphere'
     },
   },
 
-    mensaje: {
+    mensaje: [{
 
         type:{
             type: String,            
@@ -55,11 +56,11 @@ const AddressSchema = Schema({
             
         },  
         coordinates: {
-            type: Array,
+            type: [Number],
             required: false   
     },    
        
-   },
+   }],
 
      precio: {
       type: Number,
@@ -72,7 +73,8 @@ const AddressSchema = Schema({
     },
     horaEsperaInicio: {
         type: Date,
-        required: false  
+        required: false,
+        default: null  
     },
     horaEsperaFin: {
         type: Date,

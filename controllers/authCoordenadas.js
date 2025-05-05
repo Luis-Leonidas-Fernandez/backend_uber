@@ -28,7 +28,7 @@ const postUbicacion = async(req, res = response) => {
             destino: {type: "Point", coordinates: destino},
             distanciaKm: distanciaKm,
             precio: precio,
-            mensaje:   { type: "Point",coordinates: [  [-58.984374,-27.451225]  ]}
+            mensaje:   [{ type: "Point",coordinates: [-58.984374,-27.451225]}]
           
             
         }        
@@ -37,13 +37,17 @@ const postUbicacion = async(req, res = response) => {
       
        
         if(dist <= 2000){           
-           
-            const address = new Address(imput);         
-       
+            
+            
+            const address = new Address(imput);  
             const result = await address.save();
-            const coords = result.mensaje.coordinates;
-            const points =  coords[coords.length -1];
-            const types = result.mensaje.type;
+
+     
+            const coords = result.mensaje[0].coordinates;
+            
+            const points =  coords;            
+            const types = result.mensaje[0].type;
+            
 
 
             const data = {
@@ -53,28 +57,29 @@ const postUbicacion = async(req, res = response) => {
                 ubicacion: result.ubicacion,
                 distanciaKm: result.distanciaKm,
                 precio: result.precio,
-                mensaje: { type: types, coordinates: points},
+                mensaje: [{ type: types, coordinates: points}],
                 createdAt: result.createdAt,
                 updatedAt: result.updatedAt
             }
 
-            console.log('[Build Document:]', data);
+         
             
             return res.status(200).json({data});
 
         } else{
-            console.log('paso por aqui: respuesta miId: null')
+            
             const data = {
                 id: null,
                 miId: null
             }
+           
             return res.status(200).json({ data});;
         }
 
         
 
     } catch (error) {
-       
+      
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'
@@ -108,7 +113,7 @@ const removeAddress = async (req = request, res = response) => {
   
       const idDriver = UserAddress.idDriver;
   
-      // ❌ Quitamos idDriver del documento de la Address
+    
       await Address.findOneAndUpdate(
         { idDriver: idDriver },
         { $unset: { idDriver: "" } }
@@ -131,7 +136,7 @@ const removeAddress = async (req = request, res = response) => {
       });
   
     } catch (error) {
-      console.error('❌ Error en removeAddress:', error);
+      
       res.status(500).json({
         ok: false,
         msg: 'Hable con el administrador'

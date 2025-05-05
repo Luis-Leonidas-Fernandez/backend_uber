@@ -158,9 +158,7 @@ const finishTravel = async(req = request, res = response) => {
     const  order     = req.body.order;
     const status   = req.body.status; 
 
-    console.log('[REQ.BODY.IdDriver:]', idDriver);
-    console.log('[REQ.BODY.Order:]', order);
-    console.log('[REQ.BODY.Status:]', status);
+
     
    try {
 
@@ -176,15 +174,14 @@ const finishTravel = async(req = request, res = response) => {
         { new: true }
       );
       
-      //console.log('[RESPONSE ADD DRIVER TO BLACK LIST:]', addBlackList);
+    
       // Se actualiza el estado del Conductor en la colecion DRIVER
       const driverStatus = await Driver.findOneAndUpdate(
         {_id: idDriver},
         {$set: { order: order,  status: status}},
         { new: true, runValidators: true } );  
                              
-      console.log('[ADDRESS COLLECTION:]', UserAddress);
-      console.log('[DRIVER COLLECTION.Status:]', driverStatus);
+
       
       
       if (!UserAddress){
@@ -196,7 +193,7 @@ const finishTravel = async(req = request, res = response) => {
        const data = {
            UserAddress,                
        } 
-       console.log('[RES.JSON]', data);                
+                  
        res.json({
            data
        });
@@ -216,8 +213,7 @@ const updateHoraEsperaFin = async (req = request, res = response) => {
     const id = req.params._id;
     //const idObject = new ObjectId(id);
     const { horaEsperaFin } = req.body;
-    console.log('[REQ.BODY.horaEsperaFin :] ', horaEsperaFin);
-    console.log('[REQ.PARAMS.ID ADDRESS :]', id);
+
   
     try {
       const address = await Address.findById(id);
@@ -228,10 +224,10 @@ const updateHoraEsperaFin = async (req = request, res = response) => {
           msg: 'No se encontró la orden con ese ID',
         });
       }
-      console.log('[ENCONTRO UNA ADDRESS :]');
+ 
       address.horaEsperaFin = new Date(horaEsperaFin);
       await address.save();
-      console.log('[SE GUARDO ADDRESS ACTUALIZADA CORRECTAMENTE:]');
+     
       return res.json({
         ok: true,
         msg: 'Hora de espera final actualizada correctamente',
@@ -240,7 +236,7 @@ const updateHoraEsperaFin = async (req = request, res = response) => {
       
 
     } catch (error) {
-      console.error('Error actualizando horaEsperaFin:', error);
+     
       return res.status(500).json({
         ok: false,
         msg: 'Error del servidor',

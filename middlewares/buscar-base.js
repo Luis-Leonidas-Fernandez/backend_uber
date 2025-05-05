@@ -76,7 +76,7 @@ const buscarBaseCercana = async(ubicacion) => {
               ? new mongoose.Types.ObjectId(id)
               : id
           );
-          
+            
        
         const bases = await Base.aggregate([
             {

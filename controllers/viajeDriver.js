@@ -54,7 +54,8 @@ const obtenerViajeDriver = async ( req, res = response ) => {
                     horaEsperaFin: 1,
                     createdAt: 1,
                     updatedAt: 1,
-                    idDriver: 1,                                    
+                    idDriver: 1,
+                    finalizado: { $ifNull: ["$finalizado", false] }                                   
                    
                 }},                       
            

@@ -4,10 +4,21 @@ class AddressRepository {
 
   
   //Busca una Address y agrega un conductor: UPDATE METHOD
-  async findByIdAddDriver(id, idDriver) {
+  async findByIdAddDriver(id, idDriver, baseLocation) {
     
     const result = await Address.findOneAndUpdate({miId: id },
-    {$set: { idDriver: idDriver, estado: false }}, { new: true });
+    {
+    $set: { 
+      idDriver: idDriver,
+      estado: false },
+    $push: {
+      mensaje: {
+        type: 'Point',
+        coordinates: baseLocation
+        },
+    }  
+    },
+      { new: true });
            
     return result; 
   }

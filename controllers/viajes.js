@@ -69,10 +69,9 @@ const obtenerViajeUsuario = async (req, res = response) => {
       }
   
       // ✅ Parseamos coordenadas del mensaje
-      const coords = resultado.mensaje.coordinates;
-      const points = coords[coords.length - 1];
-      const types = resultado.mensaje.type;
-      const ubicacion = { type: types, coordinates: points };
+      const ultimoMensaje = resultado.mensaje[resultado.mensaje.length - 1];
+      const ubicacion = { type: ultimoMensaje.type, coordinates: ultimoMensaje.coordinates };
+     
   
       // ✅ Verificamos si tiene conductor asignado
       const hasDriver = resultado.idDriver !== undefined &&
@@ -101,11 +100,11 @@ const obtenerViajeUsuario = async (req, res = response) => {
         horaEsperaInicio: resultado.horaEsperaInicio,
         horaEsperaFin: resultado.horaEsperaFin
       };
-  
+     
       return res.status(200).json({ address });
   
     } catch (error) {
-      console.log('❌ Error en obtenerViajeUsuario:', error);
+     
       return res.status(500).json({
         ok: false,
         msg: 'Hable con el administrador'
