@@ -57,23 +57,25 @@ const assigDriverAutomatic = async( req = request, res = response ) => {
     
     const  noDisponible = 'no disponible';   
     const  driversNotAvailable = 'Conductores no disponibles';
-
+    let assignedDriver = null;
     try {
 
-        
+    console.log('🔧 Iniciando asignación de conductor...');
+    console.log('🧾 Datos recibidos:', { miId, ubicacion });        
         //Busca Zona mas Cercana - Extrae idBase y Distancia de las bases
          
         const zona = await buscarZonaCercana(ubicacion);       
-        
+        console.log('📍 Zona más cercana encontrada:', zona);         
         const idBase    = zona.basesIds;
         const distancia = zona.dist;
         const baseSelected   =  await Base.findOne({_id: idBase});
+       console.log('📦 Base seleccionada:', baseSelected); 
         const baseLocation = baseSelected.ubicacion.coordinates;  
 
 
 
          if(distancia > 3000) {   
-         
+         console.log('🚫 Zona muy alejada, sin conductores asignables (distancia > 3000):', distancia); 
           return res.json({
             ok: false,
             driversNotAvailable,
@@ -85,10 +87,10 @@ const assigDriverAutomatic = async( req = request, res = response ) => {
 
         // **** BUSCA TODAS LAS BASES DE UNA DETERMINADA ZONA MAS SUS CONDUCTORES *****
         const driverList = await findBasesByIdsAndDrivers(idBase);
-       
+       console.log('🔎 Conductores encontrados en la zona:', driverList.length);
 
         if (driverList.length === 0) {
-
+           console.log('🚫 No hay conductores disponibles en las bases.'); 
             return res.json({ ok: false, driversNotAvailable, miId });
 
         }
@@ -96,50 +98,55 @@ const assigDriverAutomatic = async( req = request, res = response ) => {
       
         // 🧠 Traer address actual del usuario para revisar la blacklist
         const userAddress = await Address.findOne({ miId });
-
+       console.log('📬 Dirección actual del usuario:', userAddress);
         if (!userAddress) {
+         console.log('🚫 No se encontró la dirección del usuario.');
          return res.json({ ok: false, msg: 'No se encontró la dirección del usuario' });
         }
 
         const blacklist = userAddress.blackList.map(driver => driver.toString());
-        
+        console.log('🛑 Lista negra del usuario:', blacklist);
         // 🔁 Buscar conductor que NO esté en blacklist
-        let assignedDriver = null;
+        
 
         for (const item of driverList) {
         const idDriver = item.drivers._id.toString();
 
         if (!blacklist.includes(idDriver)) {
         assignedDriver = idDriver;
+        console.log('✅ Conductor asignado:', assignedDriver);
         break;
         }
        }
         
         if (!assignedDriver) {
+       console.log('🚫 Todos los conductores están en la blacklist.');
         return res.json({ ok: false, driversNotAvailable, miId });
         }
         
         
          // ✅ Asignar conductor a la Address
          const addressUpdated = await addDriverToAddress(miId, assignedDriver,baseLocation);
-
+         console.log('📍 Resultado de actualizar Address:', addressUpdated);
          if (!addressUpdated) {
+        console.log('⚠️ No se pudo actualizar la dirección. Conductores disponibles:', driversNotAvailable);
          return res.json({ ok: false, driversNotAvailable, miId });
 
         }
 
         //Actualiza el estdod del coductor a en-camino
         await updateStatusDriverAsing(assignedDriver, noDisponible);
-              
+        console.log('✅ Estado del conductor actualizado a "en-camino":', assignedDriver);      
         
         const data = { addressUpdated }  
+       console.log('🎯 Finalización exitosa del proceso de asignación:', data); 
 
         return res.json({ok: true , data});
         
                           
         
     } catch (error) {
-           
+       console.error('❌ Error en asignación de conductor:', error);    
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'
