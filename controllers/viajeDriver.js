@@ -55,7 +55,7 @@ const obtenerViajeDriver = async ( req, res = response ) => {
                     createdAt: 1,
                     updatedAt: 1,
                     idDriver: 1,
-                    finalizado: { $ifNull: ["$finalizado", false] }                                   
+                    finalizado: { $ifNull: ["$finalizado",  false] }                                   
                    
                 }},                       
            

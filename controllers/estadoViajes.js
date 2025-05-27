@@ -152,7 +152,71 @@ const statusUpdate = async(req = request, res = response) => {
           
 }
 
-const finishTravel = async(req = request, res = response) => {   
+
+const removeAddress = async (req = request, res = response) => {
+    const { order, idDriver, precioTotal } = req.body;
+  
+    try {
+      // 🧩 Actualizamos el documento de la orderr: eliminamos campos, y agregamos otros
+      const UserAddress = await Address.findOneAndUpdate(
+        { idDriver: idDriver },
+        {
+          $unset: { miId: "", estado: "" },
+          $set: {
+            precioTotal: precioTotal,
+            finalizado: true,
+          }
+        },
+        { new: true } // ← para obtener el documento actualizado
+      );
+  
+      if (!UserAddress) {
+        return res.status(400).json({
+          ok: false,
+          msg: 'El pedido no puede ser cancelado'
+        });
+      }
+  
+      //const idDriver = UserAddress.idDriver;
+  
+    
+      await Address.findOneAndUpdate(
+        { idDriver: idDriver },
+        { $unset: { idDriver: "" } }
+      );
+  
+      // ✅ Liberamos al conductor
+      await Driver.findOneAndUpdate(
+        { _id: idDriver },
+        {
+          $set: {
+            order: order,
+            status: 'disponible'
+          },
+          $upsert: true
+        }
+      );
+  
+      res.json({
+        data: UserAddress
+      });
+  
+    } catch (error) {
+      
+      res.status(500).json({
+        ok: false,
+        msg: 'Hable con el administrador'
+      });
+    }
+  };
+
+
+
+
+
+
+
+const cancelTravel = async(req = request, res = response) => {   
            
     const  idDriver  = req.body.idDriver;
     const  order     = req.body.order;
@@ -246,11 +310,12 @@ const updateHoraEsperaFin = async (req = request, res = response) => {
 
 module.exports = {
     statusUpdate,
-    finishTravel,
+    cancelTravel,
     locationDriverUpdate,
     statusDriverArrived,
     statusDriverDisconnect,
-    updateHoraEsperaFin
+    updateHoraEsperaFin,
+    removeAddress
       
 }
 

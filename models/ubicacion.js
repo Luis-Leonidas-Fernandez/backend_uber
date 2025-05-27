@@ -87,8 +87,9 @@ const AddressSchema = Schema({
         required: false,
       },
       finalizado: {
-        type: String,
+        type: Boolean,
         required: false,
+        default: false
       },  
    
    blackList: {

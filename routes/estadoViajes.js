@@ -4,7 +4,7 @@
 */
 const { Router } = require('express');
 const { validarJWTDRIVER } = require('../middlewares/validar-jwt-driver');
-const { statusUpdate, finishTravel } = require('../controllers/estadoViajes');
+const { statusUpdate, cancelTravel, removeAddress } = require('../controllers/estadoViajes');
 
 
 
@@ -12,7 +12,9 @@ const router = Router();
 
 //update the driver's order field
 router.put('/update',validarJWTDRIVER, statusUpdate );
+//update to cancel travel
+router.put('/cancel-travel',validarJWTDRIVER,  cancelTravel);
 //update to finish travel
-router.put('/finish-travel',validarJWTDRIVER,  finishTravel);
+router.put('/remove/address', validarJWTDRIVER, removeAddress);
 
 module.exports = router;

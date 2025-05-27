@@ -51,6 +51,7 @@ const obtenerViajeUsuario = async (req, res = response) => {
             estado: 1,
             mensaje: "$mensaje",
             idDriver: 1,
+            finalizado: 1,
             createdAt: 1,
             updatedAt: 1,
             distanciaKm: 1,
@@ -77,6 +78,8 @@ const obtenerViajeUsuario = async (req, res = response) => {
       const hasDriver = resultado.idDriver !== undefined &&
                         resultado.idDriver !== null &&
                         resultado.idDriver !== '';
+
+               
   
       const address = {
         ok: hasDriver, // 👈 Esto lo usa Flutter para saber si ya hay conductor
@@ -98,7 +101,8 @@ const obtenerViajeUsuario = async (req, res = response) => {
         precio: resultado.precio, // agregado reciente
         idDriver: resultado.idDriver,
         horaEsperaInicio: resultado.horaEsperaInicio,
-        horaEsperaFin: resultado.horaEsperaFin
+        horaEsperaFin: resultado.horaEsperaFin,
+        finalizado: resultado.finalizado
       };
      
       return res.status(200).json({ address });
