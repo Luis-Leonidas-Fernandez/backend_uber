@@ -2,12 +2,12 @@ const Address = require('../models/ubicacion');
 const Driver = require( '../models/driver');
 
 
-const driverConectado = async(uid = '') => {
-   console.log('👉 Entrando a driverConectado con UID:', uid); 
+const driverConectado = async(uid = '', io) => {
+   
     const driver = await Driver.findById(uid);
 
     if (!driver) {
-        console.error('❌ No se encontró al conductor con ID:', uid);
+       
         return null;
     }
 
@@ -22,16 +22,15 @@ const driverConectado = async(uid = '') => {
     }
 
     await driver.save();
-    console.log('✅ Estado actualizado del conductor (conectado):', driver);
     return driver;
 }
 
 
 const driverDesconectado = async(uid = '') => {
+   
     try {
         const driver = await Driver.findById(uid);
-        if (!driver) {
-            console.warn('⚠️ No se encontró al conductor:', uid);
+        if (!driver) {            
             return;
         }
         driver.online = false;
@@ -39,7 +38,7 @@ const driverDesconectado = async(uid = '') => {
         await driver.save();
         return driver;
     } catch (err) {
-        console.error('❌ Error al actualizar el estado del driver:', err);
+        return err;
     }
 };
 
