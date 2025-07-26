@@ -61,6 +61,14 @@ const createInvoicePdf = async (req, res = response) => {
 
     const a = precioAllViajes * 0.10;
     const desc = Math.round(a);
+
+    // Asegurar que la carpeta invoices/ existe
+    const invoicePath = path.join(__dirname, '../invoices');
+
+    if (!fs.existsSync(invoicePath)) {
+    fs.mkdirSync(invoicePath, { recursive: true });
+    }
+
    
     // crear factura pdf
     const doc = new PDFDocument({ margin: 30, size: 'A4' });
@@ -326,8 +334,8 @@ const getInvoicePdf = async (req, res = response) => {
  try {  
   
 
-  const pathImagen = path.join( __dirname, `../invoices/${item}` );  
-       
+  const pathImagen = path.join(__dirname, '../invoices', item);
+    
 
 
    if ( fs.existsSync( pathImagen ) ) {
