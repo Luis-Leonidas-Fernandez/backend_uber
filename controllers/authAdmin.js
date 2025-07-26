@@ -72,6 +72,7 @@ try {
         });
     }
 
+
     // Validar el password
     const validPassword = bcrypt.compareSync(password, adminDB.password);
 

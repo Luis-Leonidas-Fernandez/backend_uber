@@ -20,7 +20,7 @@ class BaseRepository {
               foreignField: "_id",//drivers          
               as: "driver",
               pipeline: [
-                { $project: { _id: 0, password: 0,  __v: 0 , base: 0} }
+                { $project: { _id: 1, password: 0,  __v: 0 , base: 0} }
             ],
     
             }
@@ -51,7 +51,7 @@ class BaseRepository {
     ]);  
         
     const data = Object.assign({}, ...result);    
-    
+   
     return data;
   } 
   

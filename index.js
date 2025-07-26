@@ -51,6 +51,7 @@ app.use('/api/logindriver', require('./routes/authDriver'));
 app.use('/api/drivers', require('./routes/drivers'));
 app.use('/api/status', require('./routes/estadoViajes'));
 app.use('/api/location', require('./routes/locationDriver'));
+app.use('/api/travel-history', require('./routes/travelHistory'));
 
 
 // Mis Rutas Admin

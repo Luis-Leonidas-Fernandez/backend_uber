@@ -14,7 +14,7 @@ const router = Router();
 router.put('/update',validarJWTDRIVER, statusUpdate );
 //update to cancel travel
 router.put('/cancel-travel',validarJWTDRIVER,  cancelTravel);
-//update to finish travel
+//update to finish travel and save in history travel
 router.put('/remove/address', validarJWTDRIVER, removeAddress);
 
 module.exports = router;

@@ -34,5 +34,7 @@ router.get('/drivers-from-admin/:_id/:base', validarJWT,getDriversfromBase);
 // get all bases
 router.get('/all', validarJWT,getAllBases);
 
+// traer historial de viajes de un conductor
+
 
 module.exports = router;

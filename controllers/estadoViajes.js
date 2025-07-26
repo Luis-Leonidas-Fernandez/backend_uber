@@ -1,7 +1,9 @@
 const { response } = require('express');
 const Driver = require('../models/driver');
 const Address = require('../models/ubicacion');
+const Base = require('../models/base');
 const mongoose = require('mongoose');
+const TravelHistory = require('../models/history');
 
 const statusDriverDisconnect = async(req = request, res = response) => {          
    
@@ -155,8 +157,14 @@ const statusUpdate = async(req = request, res = response) => {
 
 const removeAddress = async (req = request, res = response) => {
     const { order, idDriver, precioTotal } = req.body;
+   
   
     try {
+
+      // ✅ guardamos la address en la coleccion TravelHistoy 
+      await saveAddressInTravelHistory(idDriver, precioTotal);
+
+      
       // 🧩 Actualizamos el documento de la orderr: eliminamos campos, y agregamos otros
       const UserAddress = await Address.findOneAndUpdate(
         { idDriver: idDriver },
@@ -177,8 +185,7 @@ const removeAddress = async (req = request, res = response) => {
         });
       }
   
-      //const idDriver = UserAddress.idDriver;
-  
+      
     
       await Address.findOneAndUpdate(
         { idDriver: idDriver },
@@ -196,7 +203,11 @@ const removeAddress = async (req = request, res = response) => {
           $upsert: true
         }
       );
-  
+
+
+      //🚀 sumamos 1 address al campo viajes en la base correspondiente
+      await saveAddresInBases(idDriver);
+     
       res.json({
         data: UserAddress
       });
@@ -211,9 +222,81 @@ const removeAddress = async (req = request, res = response) => {
   };
 
 
+  const saveAddressInTravelHistory = async (idDriver, precioTotal) => {
+
+    try {
+      // Buscar el documento Address
+      const address = await Address.findOne({idDriver: idDriver});
+     
+      if (!address) {
+          throw new Error('Dirección no encontrada');
+      }
+
+      // Crear un nuevo documento para TravelHistory
+      const nuevoHistorial = new TravelHistory({
+          driverId: address.idDriver,
+          ubicacion: {
+              type: 'Point',
+              coordinates: address.ubicacion.coordinates
+          },
+          destino: {
+              type: 'Point',
+              coordinates: address.destino?.coordinates || []  // si tienes campo destino
+          },
+          distancia: parseFloat(address.distanciaKm.toFixed(2)),  // si existe en Address
+          precio: precioTotal,        // si existe en Address
+          finalizado: true,
+          createdAt: address.createdAt,
+          updatedAt: address.updatedAt
+      });
+
+      const saved = await nuevoHistorial.save();
+     
+      return saved;
+
+  } catch (error) {
+    
+      throw error;
+  }
+  };
 
 
+  const saveAddresInBases = async (idDriver) => {   
+               
 
+    try {
+
+      const driver =  await Driver.findById({_id: idDriver});
+
+      if (!driver) {
+        throw new Error('Conductor no encontrado');
+      }
+
+      const idBase  =  driver.base;
+      
+      const base = await Base.findOneAndUpdate({ 
+
+        _id: idBase }, // 🎯 busca la base donde el conducto esta suscripto
+        { $inc: { viajes: 1 } },           // ➕ suma 1 al campo "viajes"
+        { new: true }                      // 🆕 devuelve el documento actualizado);
+      ); 
+
+     
+      if (!base){
+        throw new Error('Base no encontrada');
+     }  
+  
+    
+      return base;
+    } catch (error) {
+    
+      throw error;
+  }
+}     
+     
+      
+     
+         
 
 
 const cancelTravel = async(req = request, res = response) => {   
@@ -221,7 +304,6 @@ const cancelTravel = async(req = request, res = response) => {
     const  idDriver  = req.body.idDriver;
     const  order     = req.body.order;
     const status   = req.body.status; 
-
 
     
    try {
@@ -308,6 +390,11 @@ const updateHoraEsperaFin = async (req = request, res = response) => {
     }
   };
 
+
+  
+
+
+
 module.exports = {
     statusUpdate,
     cancelTravel,
@@ -315,7 +402,8 @@ module.exports = {
     statusDriverArrived,
     statusDriverDisconnect,
     updateHoraEsperaFin,
-    removeAddress
+    removeAddress,
+    saveAddresInBases
       
 }
 

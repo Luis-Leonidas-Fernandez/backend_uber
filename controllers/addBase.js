@@ -182,6 +182,7 @@ const getDriversfromBase = async(req = request, res = response) => {
 
    if (data.drivers === null) {   
        
+    
     return res.json({
       ok: false,
       msg: 'No existen conductores registrados',
