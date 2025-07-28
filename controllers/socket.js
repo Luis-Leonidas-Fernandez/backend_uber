@@ -7,7 +7,7 @@ const driverConectado = async(uid = '', io) => {
     const driver = await Driver.findById(uid);
 
     if (!driver) {
-       
+        console.log('⛔ Driver no encontrado con UID:', uid);
         return null;
     }
 
@@ -22,6 +22,11 @@ const driverConectado = async(uid = '', io) => {
     }
 
     await driver.save();
+    console.log('✅ Driver conectado:', driver.nombre, '| Estado actualizado:', {
+        online: driver.online,
+        status: driver.status,
+        order: driver.order
+    });
     return driver;
 }
 
@@ -30,12 +35,18 @@ const driverDesconectado = async(uid = '') => {
    
     try {
         const driver = await Driver.findById(uid);
-        if (!driver) {            
+        if (!driver) {    
+            console.log('⛔ Driver no encontrado al desconectar. UID:', uid);        
             return;
         }
         driver.online = false;
         driver.status = 'no disponible';
         await driver.save();
+
+        console.log('🔌 Driver desconectado:', driver.nombre, '| Estado actualizado:', {
+            online: driver.online,
+            status: driver.status
+        });
         return driver;
     } catch (err) {
         return err;
@@ -47,13 +58,27 @@ const grabarLocation = async(payload) => {
    
 
     try {
+        const { idDriver, mensaje } = payload;
+        console.log('⛔ Payload :', idDriver, mensaje);
 
-        const miId = req.uid;
+        if (!idDriver || !mensaje) {
+            console.log('⛔ Payload incompleto:', payload);
+            return false;
+        }
 
-        Address.findOneAndUpdate({idDriver: miId},{$set: { mensaje: payload }} );
+        const updated = await Address.findOneAndUpdate(
+            { idDriver },
+            { $set: { mensaje } },
+            { new: true }
+        );
+
+        if (!updated) {
+            console.log('❗ No se encontró Address para actualizar ubicación');
+        }
 
         return true;
     } catch (error) {
+        console.error('⛔ Error al grabar ubicación:', error);
         return false;
     }
 

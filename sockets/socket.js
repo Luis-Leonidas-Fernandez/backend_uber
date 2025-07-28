@@ -9,13 +9,16 @@ io.on('connection', async (client) => {
    
     const token = client.handshake.headers['x-token']; 
     const [valido, uid] = comprobarJWT(token);
-      
+    console.log('🧪 Socket conectado con token:', token);
+    console.log('✅ Token válido:', valido, 'UID:', uid);  
 
     // Verificar autenticación
-    if (!valido) {     
+    if (!valido) {
+        console.log('⛔ Token inválido. Desconectando...');        
      return client.disconnect(); }
 
      client.uid = uid;
+
     // Driver autenticado
     io.in(uid).socketsLeave(uid);
     client.join(uid);
