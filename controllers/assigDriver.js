@@ -82,7 +82,7 @@ const assigDriverAutomatic = async( req = request, res = response ) => {
           })
 
         }
-      
+       
 
         // **** BUSCA TODAS LAS BASES DE UNA DETERMINADA ZONA MAS SUS CONDUCTORES *****
         const driverList = await findBasesByIdsAndDrivers(idBase);

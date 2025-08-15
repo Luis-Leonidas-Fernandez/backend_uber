@@ -21,6 +21,7 @@
         "jsonwebtoken": "^9.0.1",
         "mongoose": "^7.4.1",
         "mongoose-autopopulate": "^1.0.1",
+        "multer": "^2.0.2",
         "node-cron": "^3.0.2",
         "node-geocoder": "^4.2.0",
         "node-localstorage": "^3.0.5",

@@ -1,5 +1,6 @@
 const { response } = require('express');
 const bcrypt = require('bcryptjs');
+const path = require('path');
 
 const Driver=  require('../models/driver');
 const {generarJWT} = require('../helpers/jwt');
@@ -8,6 +9,7 @@ const {urlMapboxKey, tokenMapBoxKey, idMapBoxKey, mapTokenKey} = require('../tok
 
 const crearDriver = async(req, res = response) => {
 
+   
 const {         
          email,
          password,
@@ -33,6 +35,21 @@ const {
             });
         }
 
+         // Verificar que se hayan enviado ambas imágenes
+         const fotos = req.files;
+         if (!fotos?.fotoFrente || !fotos?.fotoDorso) {
+         return res.status(400).json({
+         ok: false,
+         msg: 'Falta subir la foto del carnet (frente y dorso)'
+         });
+        }
+        
+        // Obtiene la ruta RELATIVA desde la carpeta donde está `uploads`
+        const basePath = path.resolve(__dirname, '../../'); // O ajustá según estructura
+        const fotoFrentePath = path.relative(basePath, fotos.fotoFrente[0].path).replace(/\\/g, '/');
+        const fotoDorsoPath  = path.relative(basePath, fotos.fotoDorso[0].path).replace(/\\/g, '/');
+
+
         //construir objeto
 const data = {
         email,
@@ -45,8 +62,8 @@ const data = {
         modelo: req.body.modelo.toString(),
         patente: req.body.patente.toString(),
         licencia: req.body.licencia.toString(),
-
-
+        fotoFrente: fotoFrentePath,
+        fotoDorso: fotoDorsoPath
         }
 
         const newdriver = new Driver(data);
@@ -89,7 +106,7 @@ const data = {
 
 
     } catch (error) {
-       
+        
         res.status(500).json({
             ok: false,
             msg: 'Hable con el administrador'

@@ -4,7 +4,9 @@ const Driver = require('../models/driver');
 const Admin = require('../models/admin');
 const Base = require('../models/base');
 const baseRepository = require('../respositories/base_repository');
+const { model } = require('mongoose');
 const ObjectId = require('mongodb').ObjectId;
+
 
 
 
@@ -213,10 +215,77 @@ const getAllBases = async(req = request, res = response) => {
 
 }
 
+const enableDriver = async (req, res) => {
+  const idParam = req.params._id.trim(); // usa :id en la ruta
+  const idDriver =  new ObjectId(idParam);
+
+
+  try {
+
+    // busca si existe un conductor registrado
+    // crea un campo online esto es necesario para habilitar a conductor
+
+    const driverUpdated = await Driver.findByIdAndUpdate(
+      idDriver,
+      { $set: { online: false } }, 
+      { new: true } // devuelve el doc actualizado
+    );
+
+    console.log('🚀 Respuesta del registro:', driverUpdated);
+
+    if (!driverUpdated) {
+      return res.status(404).json({
+        ok: false,
+        msg: 'Conductor no se encuentra registrado',
+      });
+    }
+    
+    const result = {
+      email: driverUpdated.email,
+      nombre: driverUpdated.nombre,
+      apellido: driverUpdated.apellido,
+      nacimiento: driverUpdated.nacimiento,
+      domicilio: driverUpdated.domicilio,
+      vehiculo: driverUpdated.vehiculo,
+      model: driverUpdated.modelo,
+      patente: driverUpdated.patente,
+      licencia: driverUpdated.licencia,
+      fotoFrente: driverUpdated.fotoFrente,
+      fotoDorso: driverUpdated.fotoDorso,
+      role: driverUpdated.role,
+      order: driverUpdated.order,
+      status: driverUpdated.status,
+      viajes: driverUpdated.viajes,
+      idAddress: driverUpdated.idAddress,
+      viajes: driverUpdated.viajes,
+      cupon: driverUpdated.cupon,
+      online: driverUpdated.online
+    };
+   
+    return res.status(200).json({
+      ok: true,
+      data: result,
+    });
+
+  } catch (error) {
+    console.error('🟥 Error en el servidor:', error);
+    return res.status(500).json({
+      ok: false,
+      msg: 'Hable con el administrador',
+    });
+  }
+};
+     
+
+        
+
+
+
 
 module.exports ={
     addBaseDriver,
     addBaseAdmin,
     getDriversfromBase,
-    getAllBases
+    getAllBases,
+    enableDriver
 }

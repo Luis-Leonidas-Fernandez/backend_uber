@@ -38,6 +38,8 @@ require('./sockets/socket.js');
 const publicPath = path.resolve(__dirname, 'public');
 app.use(express.static(publicPath));
 
+// Path de acceso a fotos
+app.use('/uploads', express.static(path.resolve(__dirname, '../uploads')));
 
 
 // Mis Rutas Usuarios

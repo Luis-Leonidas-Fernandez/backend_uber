@@ -44,9 +44,19 @@ const DriverSchema = Schema({
         type: String,
         required: true
     },
+
+    fotoFrente: {
+        type: String,
+        required: false
+    },
+    fotoDorso: {
+        type: String,
+        required: false
+    },
+    
     online: {
         type: Boolean,
-        default: false
+        require: false
     },
     role: {
         type: String,
