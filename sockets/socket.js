@@ -28,8 +28,8 @@ io.on('connection', async (client) => {
     }
 
     // ⛔ Verificar si el campo 'online' existe y es true
-    if (typeof driver.online === 'undefined' || driver.online !== true) {
-    console.log('⛔ El conductor no está habilitado (campo online no existe o no es true):', uid);
+    if (typeof driver.online === 'undefined' ) {
+    console.log('⛔ El conductor no está habilitado (campo online no existe ):', uid);
     return client.disconnect();
     }
 
