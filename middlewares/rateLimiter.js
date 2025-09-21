@@ -91,7 +91,7 @@ const progressiveRateLimit = rateLimit({
     },
     standardHeaders: true,
     legacyHeaders: false,
-    handler: (req, res, res, next) => {
+    handler: (req, res, next) => {
         const attempts = req.rateLimit?.current || 0;
         const delayMinutes = Math.min(attempts * 5, 60); // Máximo 1 hora
         
