@@ -9,12 +9,14 @@ const { crearDriver, loginDriver, renewTokenDriver } = require('../controllers/a
 const { validarCampos } = require('../middlewares/validar-campos');
 const { validarJWT } = require('../middlewares/validar-jwt');
 const upload = require('../middlewares/upload');
+const { authRateLimit, registerRateLimit, loginAttemptLogger, suspiciousActivityDetector } = require('../middlewares/rateLimiter');
 
 const router = Router();
 
 
 
 router.post('/newdriver',
+    registerRateLimit, // Rate limiting para registro de driver
     upload.fields([
       { name: 'fotoFrente', maxCount: 1 },
       { name: 'fotoDorso', maxCount: 1 }
@@ -38,6 +40,9 @@ router.post('/newdriver',
 
 
 router.post('/', [
+    authRateLimit, // Rate limiting para login de driver
+    loginAttemptLogger, // Log de intentos de login de driver
+    suspiciousActivityDetector, // Detección de actividad sospechosa
     check('password', 'La contraseña es obligatoria').not().isEmpty(),
     check('email', 'El correo es obligatorio').isEmail(),
 ], loginDriver);
