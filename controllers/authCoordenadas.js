@@ -211,7 +211,7 @@ const getUbicaciones = async(req, res = response) => {
     }
 }
 
-const getUbicacionesAutomatic = async(res= response ) => {
+const getUbicacionesAutomatic = async () => {
     
         const idAdmin = '6439d6398dbdb6d5224e0bd6';
         const idOrderNull =  [{miId: "1"}];
@@ -233,11 +233,8 @@ const getUbicacionesAutomatic = async(res= response ) => {
         
 
     } catch (error) {
-       
-        res.status(500).json({
-            ok: false,
-            msg: 'Hable con el administrador'
-        });
+        console.error('Error en getUbicacionesAutomatic:', error.message);
+        return idOrderNull;
     }
 }
 

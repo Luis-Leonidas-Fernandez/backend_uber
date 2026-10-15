@@ -1,5 +1,4 @@
 const crypto = require('crypto');
-const { response } = require('express');
 
 
 
@@ -11,7 +10,7 @@ function randomValueHex (len) {
 
 }
 
-const generateVaucher = async(res = response) =>{
+const generateVaucher = async () => {
 
     const vaucher = randomValueHex(4)+"-"+randomValueHex(4)+"-"+randomValueHex(4);    
     return vaucher;

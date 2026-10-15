@@ -1,41 +1,41 @@
-const axios    = require('axios').default;
+const { createInvoiceCore, createInvoicePdfCore } = require('../controllers/invoice');
 
-
-const newInvoiceAxios = axios.create({
-    baseURL: "https://www.inriservice.com/api/invoice",//cambiar url para produccion y puerto debe ser 5000
-    timeout: 3000,
-    headers: {'Content-Type': 'application/json'}
-}) 
-
-const createInvoicePdfAxios = axios.create({
-    baseURL: "https://www.inriservice.com/api/invoice",//cambiar url para produccion y puerto debe ser 5000
-    timeout: 3000,
-    headers: {'Content-Type': 'multipart/form-data'}
-}) 
-
+let isInvoiceJobRunning = false;
+let isInvoicePdfJobRunning = false;
 
 const createInvoiceJob = async () => {
-   
-    
-    const result = await newInvoiceAxios.post(`/new`);
-
-    const response = result.data; 
-         
-    return response;
-
+    if (isInvoiceJobRunning) {
+        console.warn('createInvoiceJob: Tarea ya en ejecución, ignorando ejecución superpuesta');
+        return { ok: false, msg: 'Job already running' };
+    }
+    isInvoiceJobRunning = true;
+    try {
+        const response = await createInvoiceCore({ isInternalCron: true });
+        return response;
+    } catch (error) {
+        console.error('Error en createInvoiceJob:', error.message);
+        throw error;
+    } finally {
+        isInvoiceJobRunning = false;
+    }
 }
 
 const createInvoicePdfJob = async () => {
-
-    const result = await createInvoicePdfAxios.get(`/create-pdf-invoice`);
-
-    const response = result.data; 
-         
-    return response;
+    if (isInvoicePdfJobRunning) {
+        console.warn('createInvoicePdfJob: Tarea ya en ejecución, ignorando ejecución superpuesta');
+        return { ok: false, msg: 'Job already running' };
+    }
+    isInvoicePdfJobRunning = true;
+    try {
+        const response = await createInvoicePdfCore({ isInternalCron: true });
+        return response;
+    } catch (error) {
+        console.error('Error en createInvoicePdfJob:', error.message);
+        throw error;
+    } finally {
+        isInvoicePdfJobRunning = false;
+    }
 }
-
-
-
 
 module.exports = {
     createInvoiceJob,

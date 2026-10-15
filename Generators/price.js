@@ -1,5 +1,4 @@
 const axios    = require('axios').default;
-const { response } = require('express');
 const {LocalStorage} = require('node-localstorage');
 
 
@@ -9,7 +8,7 @@ const {LocalStorage} = require('node-localstorage');
 })  
 
 
-const getPrice = async (res = response) => {
+const getPrice = async () => {
         
      try {
 
@@ -72,14 +71,9 @@ const getPrice = async (res = response) => {
        
         
      } catch (error) {       
-        return res.status(500).json({
-           ok: false,
-           msg: 'Hable con el administrador'
-        
-        });
-    
-                   
-    }
+        console.error('Error al obtener precio del dólar:', error.message);
+        return null;
+     }
 }
 
 
