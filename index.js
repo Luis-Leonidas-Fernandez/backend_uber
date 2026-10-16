@@ -157,35 +157,6 @@ cron.schedule("0 0 * * *", async function () {
     timezone: "America/Argentina/Buenos_Aires"
 });
 
-cron.schedule("0 0 25 * *", async function () {    
-    if (mongoose.connection.readyState !== 1) {
-        console.error('createInvoiceJob: MongoDB no conectado el día 25 de facturación, se omite ejecución');
-        return;
-    }
-    try {
-        //GUARDA EN COLLECTION INVOICE LA FACTURA MENSUAL A COBRAR
-        await createInvoiceJob();
-    } catch (err) {
-        console.error('Error en cron createInvoiceJob:', err.message);
-    }
-},{
-   scheduled: true,
-   timezone: "America/Argentina/Buenos_Aires"
-});
+// P-3B.6-F7: Tareas cron de facturación y PDFs desactivadas formalmente.
+// La emisión automática mensual de facturas (día 25) y generación de PDFs (día 26) ha sido deshabilitada.
 
-
-cron.schedule("0 0 26 * *", async function () {    
-    if (mongoose.connection.readyState !== 1) {
-        console.error('createInvoicePdfJob: MongoDB no conectado el día 26 de PDFs, se omite ejecución');
-        return;
-    }
-    try {
-        //GUARDA PDF FACTURA EN DIRECTORIO 
-        await createInvoicePdfJob();
-    } catch (err) {
-        console.error('Error en cron createInvoicePdfJob:', err.message);
-    }
-},{
-  scheduled: true,
-  timezone: "America/Argentina/Buenos_Aires"
-});

@@ -1,43 +1,24 @@
-const { createInvoiceCore, createInvoicePdfCore } = require('../controllers/invoice');
-
-let isInvoiceJobRunning = false;
-let isInvoicePdfJobRunning = false;
+// P-3B.6-F7: Funciones internas de facturación y generación de PDFs desactivadas formalmente.
 
 const createInvoiceJob = async () => {
-    if (isInvoiceJobRunning) {
-        console.warn('createInvoiceJob: Tarea ya en ejecución, ignorando ejecución superpuesta');
-        return { ok: false, msg: 'Job already running' };
-    }
-    isInvoiceJobRunning = true;
-    try {
-        const response = await createInvoiceCore({ isInternalCron: true });
-        return response;
-    } catch (error) {
-        console.error('Error en createInvoiceJob:', error.message);
-        throw error;
-    } finally {
-        isInvoiceJobRunning = false;
-    }
-}
+    console.warn('createInvoiceJob: La facturación automática está deshabilitada (P-3B.6-F7)');
+    return {
+        ok: false,
+        code: 'INVOICING_DISABLED',
+        message: 'La facturación está deshabilitada'
+    };
+};
 
 const createInvoicePdfJob = async () => {
-    if (isInvoicePdfJobRunning) {
-        console.warn('createInvoicePdfJob: Tarea ya en ejecución, ignorando ejecución superpuesta');
-        return { ok: false, msg: 'Job already running' };
-    }
-    isInvoicePdfJobRunning = true;
-    try {
-        const response = await createInvoicePdfCore({ isInternalCron: true });
-        return response;
-    } catch (error) {
-        console.error('Error en createInvoicePdfJob:', error.message);
-        throw error;
-    } finally {
-        isInvoicePdfJobRunning = false;
-    }
-}
+    console.warn('createInvoicePdfJob: La generación de PDFs está deshabilitada (P-3B.6-F7)');
+    return {
+        ok: false,
+        code: 'INVOICING_DISABLED',
+        message: 'La generación de PDFs está deshabilitada'
+    };
+};
 
 module.exports = {
     createInvoiceJob,
     createInvoicePdfJob
-}
+};
